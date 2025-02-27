@@ -6,52 +6,53 @@ import React from 'react';
       content: any;
       level?: number;
     }
-    const styles = StyleSheet.create({
-      textColor: {
-        color: '#000000', // Default color, will be overridden by theme
-      },
-      card: {
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-      },
-      section: {
-        marginTop: 12,
-      },
-      sectionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 8,
-      },
-      list: {
-        marginTop: 4,
-      },
-      listItem: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 4,
-      },
-      bullet: {
-        marginRight: 8,
-        fontSize: 14,
-      },
-      text: {
-        fontSize: 14,
-        flex: 1,
-      },
-    });
+
     const DrugContentRenderer: React.FC<Props> = ({ content, level = 0 }) => {
       const { theme } = useThemeStore();
       const isDark = theme === 'dark';
-      styles.textColor.color = isDark ? '#ffffff' : '#000000';
+
+      const styles = StyleSheet.create({
+        textColor: {
+          color: isDark ? '#ffffff' : '#000000', // Set color based on theme
+        },
+        card: {
+          padding: 16,
+          borderRadius: 12,
+          marginBottom: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 3,
+        },
+        section: {
+          marginTop: 12,
+        },
+        sectionTitle: {
+          fontSize: 16,
+          fontWeight: '600',
+          marginBottom: 8,
+        },
+        list: {
+          marginTop: 4,
+        },
+        listItem: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          marginBottom: 4,
+        },
+        bullet: {
+          marginRight: 8,
+          fontSize: 14,
+        },
+        text: {
+          fontSize: 14,
+          flex: 1,
+        },
+      });
 
       if (typeof content === 'string') {
-        return <Text style={[styles.text, { color: styles.textColor.color }]}>{content}</Text>;
+        return <Text style={[styles.text, styles.textColor]}>{content}</Text>; // Apply textColor style
       }
 
       if (Array.isArray(content)) {
@@ -59,8 +60,8 @@ import React from 'react';
           <View style={styles.list}>
             {content.map((item, index) => (
               <View key={index} style={styles.listItem}>
-                <Text style={[styles.bullet, { color: styles.textColor.color }]}>•</Text>
-                <Text style={[styles.text, { color: styles.textColor.color }]}>{item}</Text>
+                <Text style={[styles.bullet, styles.textColor]}>•</Text>
+                <Text style={[styles.text, styles.textColor]}>{item}</Text>
               </View>
             ))}
           </View>
@@ -72,7 +73,7 @@ import React from 'react';
 
         return (
           <View key={key} style={[styles.section, { marginLeft: level * 16 }]}>
-            {content.title && <Text style={[styles.sectionTitle, { color: styles.textColor.color }]}>{content.title}</Text>}
+            {content.title && <Text style={[styles.sectionTitle, styles.textColor]}>{content.title}</Text>}
             <DrugContentRenderer content={value} level={level + 1} />
           </View>
         );
