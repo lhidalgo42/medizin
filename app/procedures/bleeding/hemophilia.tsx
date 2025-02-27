@@ -1,7 +1,7 @@
 import React from 'react';
     import { View, Text, StyleSheet } from 'react-native';
-    import { useThemeStore } from '../../../src/store/useThemeStore';
-    import i18n from '../../../src/i18n';
+    import { useThemeStore } from '@/src/store/useThemeStore';
+    import i18n from '@/src/i18n';
 
     const data = i18n.t('procedures.bleeding.hemophilia', { returnObjects: true });
 

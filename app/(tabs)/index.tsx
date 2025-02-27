@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import i18n from '../../src/i18n';
-import { useThemeStore } from '../../src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 const categories = [
   { id: 'falls', icon: 'body-outline', color: '#FF6B6B' },
@@ -18,8 +18,8 @@ const categories = [
   { id: 'tachyarrhythmias', icon: 'pulse-outline', color: '#FF9671' },
   { id: 'rapidIntubation', icon: 'medkit-outline', color: '#FFC75F' },
   { id: 'tacoAndHeparin', icon: 'timer-outline', color: '#F9F871' },
-  { id: 'electrolytes', icon: 'flash-outline', color: '#00C9A7' },
   { id: 'calculator', icon: 'calculator-outline', color: '#4B4453' },
+  { id: 'electrolytes', icon: 'flash-outline', color: '#00C9A7' },
 ];
 
 export default function HomeScreen() {
@@ -27,11 +27,11 @@ export default function HomeScreen() {
   const isDark = theme === 'dark';
 
   const handleCategoryPress = (categoryId: string) => {
-    router.push(`/procedures/${categoryId}`);
+    router.push({ pathname: `/procedures/${categoryId}` });
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[
         styles.container,
         { backgroundColor: isDark ? '#000000' : '#f0f0f0' }
@@ -48,16 +48,13 @@ export default function HomeScreen() {
           onPress={() => handleCategoryPress(category.id)}
         >
           <View style={[styles.iconContainer, { backgroundColor: category.color }]}>
-            <Ionicons 
+            <Ionicons
               name={category.icon as any}
               size={24}
               color="#ffffff"
             />
           </View>
-          <Text style={[
-            styles.cardText,
-            { color: isDark ? '#ffffff' : '#000000' }
-          ]}>
+          <Text style={[styles.cardText, { color: isDark ? '#ffffff' : '#000000' }]}>
             {i18n.t(`categories.${category.id}`)}
           </Text>
         </TouchableOpacity>
@@ -77,7 +74,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    width: '48%',
+    width: '32%',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,

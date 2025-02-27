@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '../../src/i18n';
-import { useThemeStore } from '../../src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 const themes = [
   { id: 'light', icon: 'sunny-outline' },

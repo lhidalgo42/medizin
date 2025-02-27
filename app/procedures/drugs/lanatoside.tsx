@@ -1,8 +1,8 @@
 import React from 'react';
-    import { View, StyleSheet } from 'react-native';
-    import { useThemeStore } from '../../../src/store/useThemeStore';
-    import i18n from '../../../src/i18n';
-    import DrugContentRenderer from './components/DrugContentRenderer';
+import { View, StyleSheet } from 'react-native';
+import { useThemeStore } from '@/src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import ContentRenderer from '../../components/ProcedureContentRenderer';
 
     const data = i18n.t('procedures.drugs.lanatoside', { returnObjects: true });
     const styles = StyleSheet.create({
@@ -26,7 +26,7 @@ import React from 'react';
 
       return (
         <View style={cardStyle}>
-          <DrugContentRenderer content={data} />
+          <ContentRenderer content={data} />
         </View>
       );
     }

@@ -1,90 +1,91 @@
-import React from 'react';
-    import { View, Text, StyleSheet, ScrollView } from 'react-native';
-    import { useThemeStore } from '../../../src/store/useThemeStore';
-    import i18n from '../../../src/i18n';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useThemeStore } from '@/src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import ProcedureContentRenderer from '../../components/ProcedureContentRenderer';
+import { router, Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // Corrected import
 
-    const data = i18n.t('procedures.bleeding.reverseTaco', { returnObjects: true });
 
-    const renderContent = (content: any, level = 0) => {
-      if (typeof content === 'string') {
-        return <Text style={[styles.text, { color: styles.textColor.color }]}>{content}</Text>;
-      }
+export default function ReverseTaco() {
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
 
-      if (Array.isArray(content)) {
-        return (
-          <View style={styles.list}>
-            {content.map((item, index) => (
-              <View key={index} style={styles.listItem}>
-                <Text style={[styles.bullet, { color: styles.textColor.color }]}>•</Text>
-                <Text style={[styles.text, { color: styles.textColor.color }]}>{item}</Text>
-              </View>
-            ))}
+  const data = i18n.t('procedures.bleeding.reverseTaco', { returnObjects: true });
+  return (
+    <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
+      <Stack.Screen
+        options={{
+          title: data.title,
+          headerStyle: {
+            backgroundColor: isDark ? '#1a1a1a' : '#ffffff'
+          },
+          headerTintColor: isDark ? '#ffffff' : '#000000'
+        }}
+      />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+      >
+        <View style={styles.contentContainer}>
+          <View style={[styles.card, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}>
+            <ProcedureContentRenderer content={data} />
           </View>
-        );
-      }
-
-      return Object.entries(content).map(([key, value]) => {
-        if (key === 'title') return null;
-
-        return (
-          <View key={key} style={[styles.section, { marginLeft: level * 16 }]}>
-            {content.title && <Text style={[styles.sectionTitle, { color: styles.textColor.color }]}>{content.title}</Text>}
-            {renderContent(value, level + 1)}
-          </View>
-        );
-      });
-    };
-
-    const styles = StyleSheet.create({
-      textColor: {
-        color: '#000000', // Default color, will be overridden by theme
-      },
-      card: {
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-      },
-      section: {
-        marginTop: 12,
-      },
-      sectionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 8,
-      },
-      list: {
-        marginTop: 4,
-      },
-      listItem: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 4,
-      },
-      bullet: {
-        marginRight: 8,
-        fontSize: 14,
-      },
-      text: {
-        fontSize: 14,
-        flex: 1,
-      },
-    });
-
-    export default function ReverseTaco() {
-      const { theme } = useThemeStore();
-      const isDark = theme === 'dark';
-
-      styles.textColor.color = isDark ? '#ffffff' : '#000000';
-      const cardStyle = StyleSheet.compose(styles.card, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' });
-
-      return (
-        <View style={cardStyle}>
-          {renderContent(data)}
         </View>
-      );
-    }
+      </ScrollView>
+      <TouchableOpacity
+        style={[styles.backButton, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}
+        onPress={() => router.back()}
+      >
+        <View style={styles.backButtonContent}>
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={isDark ? '#ffffff' : '#000000'}
+          />
+          <Text style={[styles.backButtonText, { color: isDark ? '#ffffff' : '#000000' }]}>
+            {i18n.t('common.back')}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  textColor: {
+    color: '#000000' // Default color, will be overridden by theme
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  section: {
+    marginTop: 12
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8
+  },
+  list: {
+    marginTop: 4
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4
+  },
+  bullet: {
+    marginRight: 8,
+    fontSize: 14
+  },
+  text: {
+    fontSize: 14,
+    flex: 1
+  }
+});

@@ -4,51 +4,44 @@ import { Ionicons } from '@expo/vector-icons';
 import i18n from '@/src/i18n';
 import { useThemeStore } from '@/src/store/useThemeStore';
 
-const calculatorTypes = [
-  'cirrhosis',
-  'hco3Deficit',
-  'h2oDeficit',
-  'qtInterval',
-  'correctedCalcium',
-  'renalFunction',
-  'plasmaOsmolarity',
-  'cvcPosition'
+const tachyarrhythmiasTypes = [
+
 ];
 
-export default function CalculatorListScreen() {
+export default function TachyarrhythmiasListScreen() {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
-      <Stack.Screen 
-        options={{ 
-          title: i18n.t('categories.calculator'),
+      <Stack.Screen
+        options={{
+          title: i18n.t('categories.tachyarrhythmias'),
           headerStyle: {
-            backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+            backgroundColor: isDark ? '#1a1a1a' : '#ffffff'
           },
-          headerTintColor: isDark ? '#ffffff' : '#000000',
-        }} 
+          headerTintColor: isDark ? '#ffffff' : '#000000'
+        }}
       />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         style={styles.scrollView}
       >
         <View style={styles.contentContainer}>
-          {calculatorTypes.map((type) => (
+          {tachyarrhythmiasTypes.map((type) => (
             <TouchableOpacity
               key={type}
               style={[styles.card, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}
-              onPress={() => router.push(`/procedures/calculator/${type}`)}
+              onPress={() => router.push(`/procedures/tachyarrhythmias/${type}`)}
             >
               <View style={styles.cardHeader}>
                 <Text style={[styles.title, { color: isDark ? '#ffffff' : '#000000' }]}>
-                  {i18n.t(`procedures.calculator.${type}.title`)}
+                  {i18n.t(`procedures.tachyarrhythmias.${type}.title`)}
                 </Text>
-                <Ionicons 
-                  name="chevron-forward" 
-                  size={24} 
-                  color={isDark ? '#ffffff' : '#000000'} 
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color={isDark ? '#ffffff' : '#000000'}
                 />
               </View>
             </TouchableOpacity>
@@ -60,10 +53,10 @@ export default function CalculatorListScreen() {
         onPress={() => router.back()}
       >
         <View style={styles.backButtonContent}>
-          <Ionicons 
-            name="arrow-back" 
-            size={24} 
-            color={isDark ? '#ffffff' : '#000000'} 
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={isDark ? '#ffffff' : '#000000'}
           />
           <Text style={[styles.backButtonText, { color: isDark ? '#ffffff' : '#000000' }]}>
             {i18n.t('common.back')}
@@ -76,17 +69,17 @@ export default function CalculatorListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   scrollView: {
-    flex: 1,
+    flex: 1
   },
   scrollContent: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   contentContainer: {
     flex: 1,
-    padding: 16,
+    padding: 16
   },
   card: {
     padding: 16,
@@ -96,31 +89,31 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
-    flex: 1,
+    flex: 1
   },
   backButton: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    borderTopColor: 'rgba(0, 0, 0, 0.1)'
   },
   backButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   backButtonText: {
     marginLeft: 8,
     fontSize: 16,
-    fontWeight: '500',
-  },
+    fontWeight: '500'
+  }
 });

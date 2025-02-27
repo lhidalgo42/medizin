@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '../../../src/i18n';
-import { useThemeStore } from '../../../src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 export default function HypertensiveCrisisScreen() {
   const { theme } = useThemeStore();

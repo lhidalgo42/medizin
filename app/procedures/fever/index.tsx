@@ -4,18 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import i18n from '@/src/i18n';
 import { useThemeStore } from '@/src/store/useThemeStore';
 
-const calculatorTypes = [
-  'cirrhosis',
-  'hco3Deficit',
-  'h2oDeficit',
-  'qtInterval',
-  'correctedCalcium',
-  'renalFunction',
-  'plasmaOsmolarity',
-  'cvcPosition'
+const feverTypes = [
+
 ];
 
-export default function CalculatorListScreen() {
+export default function FeverListScreen() {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
 
@@ -23,7 +16,7 @@ export default function CalculatorListScreen() {
     <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
       <Stack.Screen 
         options={{ 
-          title: i18n.t('categories.calculator'),
+          title: i18n.t('categories.fever'),
           headerStyle: {
             backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
           },
@@ -35,15 +28,15 @@ export default function CalculatorListScreen() {
         style={styles.scrollView}
       >
         <View style={styles.contentContainer}>
-          {calculatorTypes.map((type) => (
+          {feverTypes.map((type) => (
             <TouchableOpacity
               key={type}
               style={[styles.card, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}
-              onPress={() => router.push(`/procedures/calculator/${type}`)}
+              onPress={() => router.push(`/procedures/fever/${type}`)}
             >
               <View style={styles.cardHeader}>
                 <Text style={[styles.title, { color: isDark ? '#ffffff' : '#000000' }]}>
-                  {i18n.t(`procedures.calculator.${type}.title`)}
+                  {i18n.t(`procedures.fever.${type}.title`)}
                 </Text>
                 <Ionicons 
                   name="chevron-forward" 

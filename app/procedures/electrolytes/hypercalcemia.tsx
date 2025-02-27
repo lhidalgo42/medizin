@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '../../../src/i18n';
-import ProcedureContentRenderer from '../../../components/ProcedureContentRenderer';
-import { useThemeStore } from '../../../src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import ProcedureContentRenderer from '../../components/ProcedureContentRenderer';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 export default function HypercalcemiaProcedureScreen() {
   const { theme } = useThemeStore();

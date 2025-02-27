@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '../../../src/i18n';
-import { useThemeStore } from '../../../src/store/useThemeStore';
-import CirrhosisCalculator from './components/CirrhosisCalculator';
-import HCO3DeficitCalculator from './components/HCO3DeficitCalculator';
+import i18n from '@/src/i18n';
+import { useThemeStore } from '@/src/store/useThemeStore';
+import CirrhosisCalculator from './CirrhosisCalculator';
+import HCO3DeficitCalculator from './HCO3DeficitCalculator';
 
 export default function CalculatorScreen() {
   const { type } = useLocalSearchParams();

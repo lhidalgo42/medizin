@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '../../../src/i18n';
-import ProcedureContentRenderer from '../../../components/ProcedureContentRenderer';
-import { useThemeStore } from '../../../src/store/useThemeStore';
+import i18n from '@/src/i18n';
+import ProcedureContentRenderer from '../../components/ProcedureContentRenderer';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 export default function HypernatremiaProcedureScreen() {
   const { theme } = useThemeStore();
@@ -16,9 +16,9 @@ export default function HypernatremiaProcedureScreen() {
         options={{
           title: data.title,
           headerStyle: {
-            backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+            backgroundColor: isDark ? '#1a1a1a' : '#ffffff'
           },
-          headerTintColor: isDark ? '#ffffff' : '#000000',
+          headerTintColor: isDark ? '#ffffff' : '#000000'
         }}
       />
       <ScrollView
@@ -51,17 +51,17 @@ export default function HypernatremiaProcedureScreen() {
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   scrollView: {
-    flex: 1,
+    flex: 1
   },
   scrollContent: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   contentContainer: {
     flex: 1,
-    padding: 16,
+    padding: 16
   },
   card: {
     padding: 16,
@@ -71,21 +71,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3
   },
   backButton: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    borderTopColor: 'rgba(0, 0, 0, 0.1)'
   },
   backButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   backButtonText: {
     marginLeft: 8,
     fontSize: 16,
-    fontWeight: '500',
-  },
+    fontWeight: '500'
+  }
 });

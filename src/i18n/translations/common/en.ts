@@ -11,7 +11,7 @@ export default {
     fever: 'Fever',
     bloodPressure: 'Blood Pressure',
     opioids: 'Opioids',
-    drugs: 'Fármacos',
+    drugs: 'Drugs',
     bleeding: 'Bleeding',
     cardiopulmonaryArrest: 'Cardiopulmonary Arrest',
     glycemia: 'Glycemia',

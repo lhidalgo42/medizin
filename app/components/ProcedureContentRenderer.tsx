@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useThemeStore } from '../src/store/useThemeStore';
+import {useThemeStore} from '@/src/store/useThemeStore'
 
 interface Props {
   content: any;
