@@ -2,13 +2,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
     import { Stack, router } from 'expo-router';
     import { Ionicons } from '@expo/vector-icons';
     import i18n from '../../../src/i18n';
-    import ProcedureContentRenderer from '../../../components/ProcedureContentRenderer';
+    import ProcedureContentRenderer from '../../../components/ProcedureContentRenderer'; // Corrected import
     import { useThemeStore } from '../../../src/store/useThemeStore';
 
-    export default function HypokalemiaProcedureScreen() {
+    export default function HyperosmolarStateProcedureScreen() {
       const { theme } = useThemeStore();
       const isDark = theme === 'dark';
-      const data = i18n.t('procedures.electrolytes.hypokalemia', { returnObjects: true });
+      const data = i18n.t('procedures.glycemia.hyperosmolarState', { returnObjects: true });
 
       return (
         <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
@@ -49,6 +49,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
         </View>
       );
     }
+
     const styles = StyleSheet.create({
       container: {
         flex: 1,
