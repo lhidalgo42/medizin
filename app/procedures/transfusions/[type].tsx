@@ -1,13 +1,14 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import i18n from '../../../src/i18n';
 import { useThemeStore } from '../../../src/store/useThemeStore';
 
-export default function BicarbonateProcedureScreen() {
+export default function TransfusionProcedureScreen() {
+  const { type } = useLocalSearchParams();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
-  const data = i18n.t('procedures.infusions.bicarbonate', { returnObjects: true });
+  const data = i18n.t(`procedures.transfusions.${type}`, { returnObjects: true });
 
   const renderContent = (content: any, level = 0) => {
     if (typeof content === 'string') {

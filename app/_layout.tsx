@@ -26,6 +26,11 @@ export default function RootLayout() {
         <Stack.Screen name="procedures/infusions/bicarbonate" options={{ headerShown: false }} />
         <Stack.Screen name="procedures/infusions/saline" options={{ headerShown: false }} />
         <Stack.Screen name="procedures/infusions/calcium" options={{ headerShown: false }} />
+        <Stack.Screen name="procedures/opioids/[type]" options={{ headerShown: false }} />
+        <Stack.Screen name="procedures/drugs/[type]" options={{ headerShown: false }} />
+        <Stack.Screen name="procedures/bleeding/[type]" options={{ headerShown: false }} />
+        <Stack.Screen name="procedures/glycemia/[type]" options={{ headerShown: false }} />
+        <Stack.Screen name="procedures/transfusions/[type]" options={{ headerShown: false }} />
         <Stack.Screen name="procedures/electrolytes/[type]" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
