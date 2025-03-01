@@ -2,8 +2,12 @@ export default {
   common: {
     loading: 'Loading...',
     error: 'An error occurred',
+    pinchZoom: "Pinch to zoom",
+    dragMove: "Drag to move the diagram",
     retry: 'Retry',
     back: 'Back',
+    no:'NO',
+    yes:'YES',
   },
   categories: {
     falls: 'Falls',

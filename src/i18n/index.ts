@@ -1,6 +1,8 @@
 import { I18n } from 'i18n-js';
 import commonEn from './translations/common/en';
-import bloodPressureEn from './translations/procedures/bloodPressure/en';
+import hypertensiveCrisisEn from './translations/procedures/bloodPressure/hypertensiveCrisis/en';
+import hypotensionEn from './translations/procedures/bloodPressure/hypotension/en';
+import persistentHypotensionEn from './translations/procedures/bloodPressure/persistentHypotension/en';
 import infusionsEn from './translations/procedures/infusions/en';
 import calculatorEn from './translations/procedures/calculator/en';
 import drugsEn from './translations/procedures/drugs/en';
@@ -14,7 +16,11 @@ const i18n = new I18n({
   en: {
     ...commonEn,
     procedures: {
-      bloodPressure: bloodPressureEn,
+      bloodPressure: {
+        hypertensiveCrisis: hypertensiveCrisisEn,
+        hypotension: hypotensionEn,
+        persistentHypotension: persistentHypotensionEn
+      },
       infusions: infusionsEn,
       calculator: calculatorEn,
       drugs: drugsEn,
@@ -22,7 +28,7 @@ const i18n = new I18n({
       bleeding: bleedingEn,
       glycemia: glycemiaEn,
       transfusions: transfusionsEn,
-      electrolytes: electrolytesEn,
+      electrolytes: electrolytesEn
     }
   }
 });
