@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import i18n from '@/src/i18n';
 import { useThemeStore } from '@/src/store/useThemeStore';
+import { useLanguageStore } from '@/src/store/useLanguageStore';
+import { useState, useEffect } from 'react';
 
 const themes = [
   { id: 'light', icon: 'sunny-outline' },
@@ -9,15 +11,37 @@ const themes = [
   { id: 'system', icon: 'phone-portrait-outline' },
 ];
 
+const languages = [
+  { id: 'en', icon: 'globe-outline', name: 'English' },
+  { id: 'es', icon: 'globe-outline', name: 'Español' },
+  { id: 'system', icon: 'phone-portrait-outline' },
+];
+
 export default function SettingsScreen() {
   const { theme, setTheme } = useThemeStore();
+  const { language, setLanguage } = useLanguageStore();
   const isDark = theme === 'dark';
+
+  // Estado local para forzar re-renderizado cuando cambia el idioma
+  const [currentLang, setCurrentLang] = useState(language);
+
+  // Manejar cambio de idioma
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    setCurrentLang(lang); // Actualizar estado local para forzar re-renderizado
+  };
+
+  // Sincronizar el estado local con el store cuando cambie externamente
+  useEffect(() => {
+    setCurrentLang(language);
+  }, [language]);
 
   return (
     <View style={[
       styles.container,
       { backgroundColor: isDark ? '#000000' : '#f0f0f0' }
     ]}>
+      {/* Sección de tema */}
       <View style={[
         styles.section,
         { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }
@@ -28,13 +52,13 @@ export default function SettingsScreen() {
         ]}>
           {i18n.t('settings.theme')}
         </Text>
-        <View style={styles.themeContainer}>
+        <View style={styles.optionsContainer}>
           {themes.map((themeOption) => (
             <TouchableOpacity
               key={themeOption.id}
               style={[
-                styles.themeOption,
-                theme === themeOption.id && styles.selectedTheme,
+                styles.option,
+                theme === themeOption.id && styles.selectedOption,
                 { backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8' }
               ]}
               onPress={() => setTheme(themeOption.id as any)}
@@ -45,10 +69,50 @@ export default function SettingsScreen() {
                 color={theme === themeOption.id ? '#007AFF' : (isDark ? '#ffffff' : '#000000')}
               />
               <Text style={[
-                styles.themeText,
+                styles.optionText,
                 { color: isDark ? '#ffffff' : '#000000' }
               ]}>
                 {i18n.t(`settings.theme${themeOption.id.charAt(0).toUpperCase() + themeOption.id.slice(1)}`)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Sección de idioma */}
+      <View style={[
+        styles.section,
+        { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }
+      ]}>
+        <Text style={[
+          styles.sectionTitle,
+          { color: isDark ? '#ffffff' : '#000000' }
+        ]}>
+          {i18n.t('settings.language')}
+        </Text>
+        <View style={styles.optionsContainer}>
+          {languages.map((langOption) => (
+            <TouchableOpacity
+              key={langOption.id}
+              style={[
+                styles.option,
+                currentLang === langOption.id && styles.selectedOption,
+                { backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8' }
+              ]}
+              onPress={() => handleLanguageChange(langOption.id)}
+            >
+              <Ionicons
+                name={langOption.icon as any}
+                size={24}
+                color={currentLang === langOption.id ? '#007AFF' : (isDark ? '#ffffff' : '#000000')}
+              />
+              <Text style={[
+                styles.optionText,
+                { color: isDark ? '#ffffff' : '#000000' }
+              ]}>
+                {langOption.id === 'system'
+                  ? i18n.t('settings.languageSystem')
+                  : langOption.name}
               </Text>
             </TouchableOpacity>
           ))}
@@ -78,21 +142,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 16,
   },
-  themeContainer: {
+  optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  themeOption: {
+  option: {
     flex: 1,
     alignItems: 'center',
     padding: 12,
     borderRadius: 8,
     marginHorizontal: 4,
   },
-  selectedTheme: {
+  selectedOption: {
     backgroundColor: 'rgba(0, 122, 255, 0.1)',
   },
-  themeText: {
+  optionText: {
     marginTop: 8,
     fontSize: 12,
   },
