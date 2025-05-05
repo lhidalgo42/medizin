@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { G, Rect, Text as SvgText, Line, Polygon, TSpan } from 'react-native-svg';
 import Animated, {
   useAnimatedStyle,
-  useSharedValue
+  useSharedValue,
+  useAnimatedGestureHandler,
+  withSpring,
 } from 'react-native-reanimated';
+import { PinchGestureHandler, PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
 import i18n from '@/src/i18n';
 import { useThemeStore } from '@/src/store/useThemeStore';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+// Definir dimensiones del SVG aquí arriba para que estén disponibles en todo el componente
+const SVG_WIDTH = 730;
+const SVG_HEIGHT = 800;
 
 interface Node {
   id: string;
@@ -32,6 +42,10 @@ export default function HypertensiveCrisisScreen() {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
 
+  // Referencias para los manejadores de gestos
+  const pinchRef = useRef(null);
+  const panRef = useRef(null);
+
   // Colores basados en la aplicación original
   const colors = {
     title: isDark ? '#004c98' : '#0056b3',
@@ -43,11 +57,12 @@ export default function HypertensiveCrisisScreen() {
     treatment: isDark ? '#a0a0a0' : '#cccccc',
     textDark: '#000000',
     textLight: '#ffffff',
-    connectionLine: isDark ? '#888888' : '#444444'
+    connectionLine: isDark ? '#888888' : '#444444',
+    background: isDark ? '#1a1a1a' : '#ffffff'
   };
 
-  // Nodos del diagrama (se podría cargar desde i18n)
-  const [nodes, setNodes] = useState([
+  // Nodos del diagrama
+  const [nodes, setNodes] = useState<Node[]>([
     {
       id: 'checkOrganDamage',
       title: i18n.t('procedures.bloodPressure.hypertensiveCrisis.checkOrganDamage.title'),
@@ -332,8 +347,6 @@ export default function HypertensiveCrisisScreen() {
     { fromId: 'start-med', toId: 'title-med' },
     { fromId: 'acutePulmonaryEdema', toId: 'ntg' },
     { fromId: 'acutePulmonaryEdema', toId: 'furosemide' },
-    { fromId: 'ntg', toId: 'plus' },
-    { fromId: 'plus', toId: 'furosemide' },
     { fromId: 'furosemide', toId: 'renal' },
     { fromId: 'renal', toId: 'yes-renal' },
     { fromId: 'renal', toId: 'no-renal' },
@@ -346,6 +359,55 @@ export default function HypertensiveCrisisScreen() {
   const scale = useSharedValue(1);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const lastScale = useSharedValue(1);
+  const lastTranslateX = useSharedValue(0);
+  const lastTranslateY = useSharedValue(0);
+
+  // Control de zoom y encuadre
+  const MIN_SCALE = 0.5;
+  const MAX_SCALE = 3;
+  const initialScale = 0.7; // Escala inicial para ver mejor en móvil
+
+  // Establecer la escala inicial
+  React.useEffect(() => {
+    scale.value = initialScale;
+
+    // Mostrar mensaje de ayuda (opcional)
+    setTimeout(() => {
+      alert(i18n.t('common.pinchZoom') + '\n' + i18n.t('common.dragMove'));
+    }, 1000);
+  }, []);
+
+  // Manejador de gesto de pellizco para zoom
+  const pinchHandler = useAnimatedGestureHandler({
+    onStart: (_, ctx) => {
+      ctx.scale = scale.value;
+    },
+    onActive: (event, ctx) => {
+      let newScale = ctx.scale * event.scale;
+      newScale = Math.min(Math.max(newScale, MIN_SCALE), MAX_SCALE);
+      scale.value = newScale;
+    },
+    onEnd: () => {
+      lastScale.value = scale.value;
+    },
+  });
+
+  // Manejador de gesto de arrastre para navegación
+  const panHandler = useAnimatedGestureHandler({
+    onStart: (_, ctx) => {
+      ctx.translateX = translateX.value;
+      ctx.translateY = translateY.value;
+    },
+    onActive: (event, ctx) => {
+      translateX.value = ctx.translateX + event.translationX;
+      translateY.value = ctx.translateY + event.translationY;
+    },
+    onEnd: () => {
+      lastTranslateX.value = translateX.value;
+      lastTranslateY.value = translateY.value;
+    },
+  });
 
   // Estilo animado para el contenedor SVG
   const animatedStyle = useAnimatedStyle(() => {
@@ -354,9 +416,19 @@ export default function HypertensiveCrisisScreen() {
         { translateX: translateX.value },
         { translateY: translateY.value },
         { scale: scale.value }
-      ]
+      ],
     };
   });
+
+  // Control de límites para no perder el diagrama
+  const resetView = () => {
+    scale.value = withSpring(initialScale);
+    translateX.value = withSpring(0);
+    translateY.value = withSpring(0);
+    lastScale.value = initialScale;
+    lastTranslateX.value = 0;
+    lastTranslateY.value = 0;
+  };
 
   // Función para encontrar un nodo por ID
   const findNodeById = (id: string): Node | undefined => {
@@ -364,63 +436,220 @@ export default function HypertensiveCrisisScreen() {
   };
 
   // Renderizar conexiones entre nodos
+  // Renderizar conexiones entre nodos
   const renderConnections = () => {
     return connections.map((connection, index) => {
       const fromNode = findNodeById(connection.fromId);
       const toNode = findNodeById(connection.toId);
 
-      if (!fromNode || !toNode) return null;
+      if (!fromNode || !toNode) {
+        // Special case for the 'plus' connection between ntg and furosemide
+        if (connection.fromId === 'ntg' && connection.toId === 'plus') {
+          const ntgNode = findNodeById('ntg');
+          const furosemideNode = findNodeById('furosemide');
 
-      // Determinar puntos de inicio y fin
+          if (ntgNode && furosemideNode) {
+            const centerX = (ntgNode.x + ntgNode.width + furosemideNode.x) / 2;
+            const ntgY = ntgNode.y + ntgNode.height / 2;
+
+            return (
+              <G key={`connection-${index}`}>
+                {/* Horizontal line from NTG to center */}
+                <Line
+                  x1={ntgNode.x + ntgNode.width}
+                  y1={ntgY}
+                  x2={centerX}
+                  y2={ntgY}
+                  stroke={colors.connectionLine}
+                  strokeWidth="2"
+                />
+
+                {/* Plus symbol at the center */}
+                <SvgText
+                  x={centerX}
+                  y={ntgY - 5}
+                  textAnchor="middle"
+                  fill={isDark ? colors.textLight : colors.textDark}
+                  fontSize="16"
+                  fontWeight="bold"
+                >
+                  +
+                </SvgText>
+              </G>
+            );
+          }
+        } else if (connection.fromId === 'plus' && connection.toId === 'furosemide') {
+          const furosemideNode = findNodeById('furosemide');
+          const ntgNode = findNodeById('ntg');
+
+          if (furosemideNode && ntgNode) {
+            const centerX = (ntgNode.x + ntgNode.width + furosemideNode.x) / 2;
+            const furosemideY = furosemideNode.y + furosemideNode.height / 2;
+            const ntgY = ntgNode.y + ntgNode.height / 2;
+
+            return (
+              <G key={`connection-${index}`}>
+                {/* Vertical line from ntg level to furosemide level */}
+                <Line
+                  x1={centerX}
+                  y1={ntgY}
+                  x2={centerX}
+                  y2={furosemideY}
+                  stroke={colors.connectionLine}
+                  strokeWidth="2"
+                />
+
+                {/* Horizontal line from center to Furosemide */}
+                <Line
+                  x1={centerX}
+                  y1={furosemideY}
+                  x2={furosemideNode.x}
+                  y2={furosemideY}
+                  stroke={colors.connectionLine}
+                  strokeWidth="2"
+                />
+
+                {/* Arrow at the end */}
+                <Polygon
+                  points={`${furosemideNode.x - 6},${furosemideY - 6} ${furosemideNode.x - 6},${furosemideY + 6} ${furosemideNode.x},${furosemideY}`}
+                  fill={colors.connectionLine}
+                />
+              </G>
+            );
+          }
+        }
+
+        return null;
+      }
+
+      // For regular connections
+      // Check if the connection is roughly horizontal (nodes at similar Y positions)
+      const isHorizontal = Math.abs((fromNode.y + fromNode.height / 2) - (toNode.y + toNode.height / 2)) < 20;
+
+      if (isHorizontal) {
+        // For horizontal connections
+        const y = (fromNode.y + fromNode.height / 2 + toNode.y + toNode.height / 2) / 2;
+        const startX = fromNode.x + fromNode.width;
+        const endX = toNode.x;
+
+        return (
+          <G key={`connection-${index}`}>
+            <Line
+              x1={startX}
+              y1={y}
+              x2={endX}
+              y2={y}
+              stroke={colors.connectionLine}
+              strokeWidth="2"
+            />
+            <Polygon
+              points={`${endX - 6},${y - 6} ${endX - 6},${y + 6} ${endX},${y}`}
+              fill={colors.connectionLine}
+            />
+            {connection.label && (
+              <SvgText
+                x={(startX + endX) / 2}
+                y={y - 8}
+                textAnchor="middle"
+                fill={isDark ? colors.textLight : colors.textDark}
+                fontSize="16"
+              >
+                {connection.label}
+              </SvgText>
+            )}
+          </G>
+        );
+      }
+
+      // For vertical connections (nodes roughly aligned on X axis)
+      const isVertical = Math.abs((fromNode.x + fromNode.width / 2) - (toNode.x + toNode.width / 2)) < 20;
+
+      if (isVertical) {
+        const x = (fromNode.x + fromNode.width / 2 + toNode.x + toNode.width / 2) / 2;
+        const startY = fromNode.y + fromNode.height;
+        const endY = toNode.y;
+
+        return (
+          <G key={`connection-${index}`}>
+            <Line
+              x1={x}
+              y1={startY}
+              x2={x}
+              y2={endY}
+              stroke={colors.connectionLine}
+              strokeWidth="2"
+            />
+            <Polygon
+              points={`${x - 6},${endY - 6} ${x + 6},${endY - 6} ${x},${endY}`}
+              fill={colors.connectionLine}
+            />
+            {connection.label && (
+              <SvgText
+                x={x}
+                y={(startY + endY) / 2 - 8}
+                textAnchor="middle"
+                fill={isDark ? colors.textLight : colors.textDark}
+                fontSize="16"
+              >
+                {connection.label}
+              </SvgText>
+            )}
+          </G>
+        );
+      }
+
+      // For all other connections, create orthogonal routing with 3 segments
       const startX = fromNode.x + fromNode.width / 2;
       const startY = fromNode.y + fromNode.height;
       const endX = toNode.x + toNode.width / 2;
       const endY = toNode.y;
 
-      // Arreglos especiales para conexiones horizontales
-      const isHorizontal = Math.abs(startY - endY) < 10;
-
-      let x1 = startX;
-      let y1 = startY;
-      let x2 = endX;
-      let y2 = endY;
-
-      if (isHorizontal) {
-        y1 = fromNode.y + fromNode.height / 2;
-        y2 = toNode.y + toNode.height / 2;
-        x1 = fromNode.x + fromNode.width;
-        x2 = toNode.x;
-      }
-
-      // Dibujar flecha
-      const arrowSize = 6;
+      // Calculate the midpoint Y position
+      const midY = startY + (endY - startY) / 2;
 
       return (
         <G key={`connection-${index}`}>
+          {/* Vertical segment from start to midpoint */}
           <Line
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
+            x1={startX}
+            y1={startY}
+            x2={startX}
+            y2={midY}
             stroke={colors.connectionLine}
             strokeWidth="2"
           />
-          {!isHorizontal && (
-            <Polygon
-              points={`${endX - arrowSize},${endY - arrowSize} ${endX + arrowSize},${endY - arrowSize} ${endX},${endY}`}
-              fill={colors.connectionLine}
-            />
-          )}
-          {isHorizontal && (
-            <Polygon
-              points={`${x2 - arrowSize},${y2 - arrowSize} ${x2 - arrowSize},${y2 + arrowSize} ${x2},${y2}`}
-              fill={colors.connectionLine}
-            />
-          )}
+
+          {/* Horizontal segment from start X to end X */}
+          <Line
+            x1={startX}
+            y1={midY}
+            x2={endX}
+            y2={midY}
+            stroke={colors.connectionLine}
+            strokeWidth="2"
+          />
+
+          {/* Vertical segment from midpoint to end */}
+          <Line
+            x1={endX}
+            y1={midY}
+            x2={endX}
+            y2={endY}
+            stroke={colors.connectionLine}
+            strokeWidth="2"
+          />
+
+          {/* Arrow at the end */}
+          <Polygon
+            points={`${endX - 6},${endY - 6} ${endX + 6},${endY - 6} ${endX},${endY}`}
+            fill={colors.connectionLine}
+          />
+
+          {/* Position the label on the horizontal segment */}
           {connection.label && (
             <SvgText
-              x={(x1 + x2) / 2}
-              y={(y1 + y2) / 2 - 5}
+              x={(startX + endX) / 2}
+              y={midY - 8}
               textAnchor="middle"
               fill={isDark ? colors.textLight : colors.textDark}
               fontSize="16"
@@ -465,11 +694,10 @@ export default function HypertensiveCrisisScreen() {
           {node.title.split('\n').map((line, pindex) => (
             <TSpan key={`title-${pindex}`} x={node.x + node.width / 2} dy={pindex === 0 ? 0 : 15}>
               {line}
-
             </TSpan>
           ))}
         </SvgText>
-        {node.description.map((line, index) => (
+        {Array.isArray(node.description) && node.description.map((line, index) => (
           <SvgText
             key={`desc-${node.id}-${index}`}
             x={node.x + 10} y={node.y + 25 + node.title.split('\n').length * 10 + index * 14}
@@ -496,127 +724,129 @@ export default function HypertensiveCrisisScreen() {
     ));
   };
 
-  // Dimensiones para el SVG
-  const svgWidth = 730;
-  const svgHeight = 800;
-
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
-      <Stack.Screen
-        options={{
-          title: i18n.t('procedures.bloodPressure.hypertensiveCrisis.title'),
-          headerStyle: {
-            backgroundColor: isDark ? '#1a1a1a' : '#ffffff'
-          },
-          headerTintColor: isDark ? '#ffffff' : '#000000'
-        }}
-      />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        style={styles.scrollView}
-      >
-        <View style={styles.contentContainer}>
-          <View style={[styles.card, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}>
-            <View style={styles.algorithmContainer}>
-              <Animated.View style={[styles.svgContainer, animatedStyle]}>
-                <ScrollView
-                  horizontal
-                  maximumZoomScale={3}
-                  minimumZoomScale={0.5}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                >
-                  <Svg width={svgWidth} height={svgHeight}>
+    <GestureHandlerRootView style={styles.gestureContainer}>
+      <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#f0f0f0' }]}>
+        <Stack.Screen
+          options={{
+            title: i18n.t('procedures.bloodPressure.hypertensiveCrisis.title'),
+            headerStyle: {
+              backgroundColor: isDark ? '#1a1a1a' : '#ffffff'
+            },
+            headerTintColor: isDark ? '#ffffff' : '#000000'
+          }}
+        />
+
+        <View style={[styles.card, { backgroundColor: colors.background }]}>
+          <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={[styles.controlButton, { backgroundColor: isDark ? '#333' : '#eee' }]}
+              onPress={resetView}
+            >
+              <Ionicons name="refresh" size={24} color={isDark ? '#fff' : '#333'} />
+            </TouchableOpacity>
+          </View>
+
+          <PanGestureHandler
+            ref={panRef}
+            onGestureEvent={panHandler}
+            simultaneousHandlers={pinchRef}
+          >
+            <Animated.View>
+              <PinchGestureHandler
+                ref={pinchRef}
+                onGestureEvent={pinchHandler}
+                simultaneousHandlers={panRef}
+              >
+                <Animated.View style={[styles.svgContainer, animatedStyle]}>
+                  <Svg width={SVG_WIDTH} height={SVG_HEIGHT}>
                     {renderConnections()}
                     {renderNodes()}
                   </Svg>
-                </ScrollView>
-              </Animated.View>
-            </View>
+                </Animated.View>
+              </PinchGestureHandler>
+            </Animated.View>
+          </PanGestureHandler>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}
+          onPress={() => router.back()}
+        >
+          <View style={styles.backButtonContent}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={isDark ? '#ffffff' : '#000000'}
+            />
+            <Text style={[styles.backButtonText, { color: isDark ? '#ffffff' : '#000000' }]}>
+              {i18n.t('common.back')}
+            </Text>
           </View>
-        </View>
-      </ScrollView>
-      <TouchableOpacity
-        style={[styles.backButton, { backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }]}
-        onPress={() => router.back()}
-      >
-        <View style={styles.backButtonContent}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={isDark ? '#ffffff' : '#000000'}
-          />
-          <Text style={[styles.backButtonText, { color: isDark ? '#ffffff' : '#000000' }]}>
-            {i18n.t('common.back')}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+        </TouchableOpacity>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  scrollView: {
-    flex: 1
-  },
-  scrollContent: {
-    flexGrow: 1
-  },
-  contentContainer: {
+  gestureContainer: {
     flex: 1,
-    padding: 16
+  },
+  container: {
+    flex: 1,
+    position: 'relative',
   },
   card: {
-    padding: 12,
+    flex: 1,
     borderRadius: 12,
-    marginBottom: 16,
+    margin: 16,
+    padding: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
+    position: 'relative',
   },
-  algorithmContainer: {
-    height: 850,
-    width: '100%'
+  controlsContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 100,
+    flexDirection: 'row',
+  },
+  controlButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   svgContainer: {
-    backgroundColor: 'transparent'
-  },
-  instructionsContainer: {
-    marginTop: 16,
-    padding: 8,
-    borderRadius: 8
-  },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 4
-  },
-  bullet: {
-    marginRight: 8,
-    fontSize: 14
-  },
-  text: {
-    fontSize: 14,
-    flex: 1
+    backgroundColor: 'transparent',
+    width: SVG_WIDTH,
+    height: SVG_HEIGHT,
   },
   backButton: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)'
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
   },
   backButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   backButtonText: {
     marginLeft: 8,
     fontSize: 16,
-    fontWeight: '500'
-  }
+    fontWeight: '500',
+  },
 });
