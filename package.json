@@ -6,8 +6,25 @@
   "type": "module",
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 npx expo start",
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "build:web": "npx expo export --platform web",
-    "lint": "expo lint"
+    "build:android": "eas build --platform android",
+    "build:ios": "eas build --platform ios",
+    "build:all": "eas build --platform all",
+    "submit:android": "eas submit --platform android",
+    "submit:ios": "eas submit --platform ios",
+    "update": "eas update",
+    "lint": "expo lint",
+    "lint:fix": "expo lint --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "expo start --clear",
+    "test": "echo \"No tests specified\" && exit 0",
+    "doctor": "expo doctor",
+    "install:clean": "rm -rf node_modules package-lock.json && npm install"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
@@ -45,7 +62,36 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-expo": "^7.0.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-native": "^4.0.0",
+    "prettier": "^3.0.0",
     "expo-cli": "^6.3.10",
     "typescript": "^5.3.3"
-  }
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "medical",
+    "procedures",
+    "healthcare",
+    "mobile-app",
+    "typescript"
+  ],
+  "author": {
+    "name": "Leo",
+    "email": "leo@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/medizin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/medizin/issues"
+  },
+  "homepage": "https://github.com/username/medizin#readme"
 }

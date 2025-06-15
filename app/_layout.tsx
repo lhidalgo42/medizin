@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'react-native';
 import { useThemeStore } from '@/src/store/useThemeStore';
+import { ThemeProvider } from './components/ThemeContext';
 
 export default function RootLayout() {
   const systemTheme = useColorScheme();
@@ -15,7 +16,7 @@ export default function RootLayout() {
   }, [systemTheme, theme]);
 
   return (
-    <>
+    <ThemeProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="procedures/[category]" options={{ headerShown: false }} />
@@ -34,6 +35,6 @@ export default function RootLayout() {
         <Stack.Screen name="procedures/electrolytes/[type]" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-    </>
+    </ThemeProvider>
   );
 }
