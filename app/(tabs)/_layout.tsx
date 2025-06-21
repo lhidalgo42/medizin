@@ -1,11 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '@/src/i18n';
-import { useThemeStore } from '@/src/store/useThemeStore';
+import { useTranslation } from '@/src/hooks/useTranslation';
+import { useTheme } from '@/app/components';
 
 export default function TabLayout() {
-  const { theme } = useThemeStore();
-  const isDark = theme === 'dark';
+  const { t } = useTranslation();
+  const { isDark } = useTheme();
 
   return (
     <Tabs screenOptions={{
@@ -23,7 +23,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Medizin',
+          title: t('common.appTitle'),
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="medical" size={size} color={color} />
           )
@@ -32,7 +32,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: i18n.t('settings.title'),
+          title: t('settings.title'),
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           )

@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import i18n from '@/src/i18n';
 import { useThemeStore } from '@/src/store/useThemeStore';
 import { useLanguageStore } from '@/src/store/useLanguageStore';
-import { useState, useEffect } from 'react';
+import { useTranslation } from '@/src/hooks/useTranslation';
+import { useTheme } from '@/app/components';
 
 const themes = [
   { id: 'light', icon: 'sunny-outline' },
@@ -20,21 +20,13 @@ const languages = [
 export default function SettingsScreen() {
   const { theme, setTheme } = useThemeStore();
   const { language, setLanguage } = useLanguageStore();
-  const isDark = theme === 'dark';
-
-  // Estado local para forzar re-renderizado cuando cambia el idioma
-  const [currentLang, setCurrentLang] = useState(language);
+  const { t } = useTranslation();
+  const { isDark } = useTheme();
 
   // Manejar cambio de idioma
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang);
-    setCurrentLang(lang); // Actualizar estado local para forzar re-renderizado
   };
-
-  // Sincronizar el estado local con el store cuando cambie externamente
-  useEffect(() => {
-    setCurrentLang(language);
-  }, [language]);
 
   return (
     <View style={[
@@ -50,7 +42,7 @@ export default function SettingsScreen() {
           styles.sectionTitle,
           { color: isDark ? '#ffffff' : '#000000' }
         ]}>
-          {i18n.t('settings.theme')}
+          {t('settings.theme')}
         </Text>
         <View style={styles.optionsContainer}>
           {themes.map((themeOption) => (
@@ -72,7 +64,7 @@ export default function SettingsScreen() {
                 styles.optionText,
                 { color: isDark ? '#ffffff' : '#000000' }
               ]}>
-                {i18n.t(`settings.theme${themeOption.id.charAt(0).toUpperCase() + themeOption.id.slice(1)}`)}
+                {t(`settings.theme${themeOption.id.charAt(0).toUpperCase() + themeOption.id.slice(1)}`)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -88,7 +80,7 @@ export default function SettingsScreen() {
           styles.sectionTitle,
           { color: isDark ? '#ffffff' : '#000000' }
         ]}>
-          {i18n.t('settings.language')}
+          {t('settings.language')}
         </Text>
         <View style={styles.optionsContainer}>
           {languages.map((langOption) => (
@@ -96,7 +88,7 @@ export default function SettingsScreen() {
               key={langOption.id}
               style={[
                 styles.option,
-                currentLang === langOption.id && styles.selectedOption,
+                language === langOption.id && styles.selectedOption,
                 { backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8' }
               ]}
               onPress={() => handleLanguageChange(langOption.id)}
@@ -104,14 +96,14 @@ export default function SettingsScreen() {
               <Ionicons
                 name={langOption.icon as any}
                 size={24}
-                color={currentLang === langOption.id ? '#007AFF' : (isDark ? '#ffffff' : '#000000')}
+                color={language === langOption.id ? '#007AFF' : (isDark ? '#ffffff' : '#000000')}
               />
               <Text style={[
                 styles.optionText,
                 { color: isDark ? '#ffffff' : '#000000' }
               ]}>
                 {langOption.id === 'system'
-                  ? i18n.t('settings.languageSystem')
+                  ? t('settings.languageSystem')
                   : langOption.name}
               </Text>
             </TouchableOpacity>

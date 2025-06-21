@@ -8,6 +8,7 @@ export default {
     back: 'Back',
     no:'NO',
     yes:'YES',
+    appTitle: 'Medizin',
   },
   categories: {
     falls: 'Falls',

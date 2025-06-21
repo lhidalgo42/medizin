@@ -1,6 +1,7 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import { lightTheme, darkTheme, Theme } from '../styles/theme';
+import { useThemeStore } from '@/src/store/useThemeStore';
 
 interface ThemeContextType extends Theme {
   isDark: boolean;
@@ -9,8 +10,16 @@ interface ThemeContextType extends Theme {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const systemColorScheme = useColorScheme();
+  const { theme: selectedTheme } = useThemeStore();
+  
+  const isDark = useMemo(() => {
+    if (selectedTheme === 'system') {
+      return systemColorScheme === 'dark';
+    }
+    return selectedTheme === 'dark';
+  }, [selectedTheme, systemColorScheme]);
+  
   const theme = isDark ? darkTheme : lightTheme;
   
   return (

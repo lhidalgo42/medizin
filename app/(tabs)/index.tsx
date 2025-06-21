@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import i18n from '@/src/i18n';
-import { useThemeStore } from '@/src/store/useThemeStore';
+import { useTranslation } from '@/src/hooks/useTranslation';
+import { useTheme } from '@/app/components';
 
 const categories = [
   { id: 'falls', icon: 'body-outline', color: '#FF6B6B' },
@@ -23,8 +23,8 @@ const categories = [
 ];
 
 export default function HomeScreen() {
-  const { theme } = useThemeStore();
-  const isDark = theme === 'dark';
+  const { t } = useTranslation();
+  const { isDark } = useTheme();
 
   const handleCategoryPress = (categoryId: string) => {
     // @ts-ignore
@@ -56,7 +56,7 @@ export default function HomeScreen() {
             />
           </View>
           <Text style={[styles.cardText, { color: isDark ? '#ffffff' : '#000000' }]}>
-            {i18n.t(`categories.${category.id}`)}
+            {t(`categories.${category.id}`)}
           </Text>
         </TouchableOpacity>
       ))}

@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
+images_previus_app*
 # Expo
 .expo/
 dist/
@@ -56,7 +56,6 @@ yarn-error.*
 *~
 
 # OS generated files
-.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
@@ -67,9 +66,7 @@ Thumbs.db
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+
 
 # Runtime data
 pids
@@ -91,7 +88,7 @@ coverage/
 build/Release
 
 # Dependency directories
-node_modules/
+
 jspm_packages/
 
 # Optional npm cache directory
@@ -110,8 +107,7 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
+.env*
 
 # Storybook build outputs
 .out
@@ -123,7 +119,6 @@ temp/
 
 # Editor directories and files
 .vscode/
-.idea/
 *.suo
 *.ntvs*
 *.njsproj
@@ -132,7 +127,7 @@ temp/
 
 # Build outputs
 build/
-dist/
+
 out/
 
 # Testing
@@ -140,7 +135,6 @@ out/
 /.nyc_output
 
 # Misc
-*.tgz
 *.tar.gz
 .cache/
 
