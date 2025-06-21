@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const isDark = theme === 'dark';
 
   const handleCategoryPress = (categoryId: string) => {
+    // @ts-ignore
     router.push({ pathname: `/procedures/${categoryId}` });
   };
 
